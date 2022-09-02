@@ -20,7 +20,7 @@ class SKETCH:
                 (thresh, blackAndWhiteImage) = cv2.threshold(grayImage, 127, 255, cv2.THRESH_BINARY)    
                 #mise à plat
                 X.append(blackAndWhiteImage.ravel());
-                y.append(file_in.split('/')[0]);
+                y.append(self.LABEL_NAMES.index(file_in.split('/')[0]));
         self.X=np.asarray(X).reshape(19000,224*224);
         self.y=np.asarray(y);
     def show_examples(self):
@@ -31,7 +31,7 @@ class SKETCH:
                 rand=np.random.choice(range(self.X.shape[0]));
                 axes[i][j].set_axis_off();
                 axes[i][j].imshow(self.__prep_img(rand), cmap="gray");
-                axes[i][j].set_title(self.y[rand]);
+                axes[i][j].set_title(self.LABEL_NAMES[self.y[rand]]);
         plt.show();
     def __prep_img(self,idx):
         img=self.X[idx].reshape(224,224).astype(np.uint8)/255;
@@ -57,9 +57,10 @@ class NearestNeighbor:
         #X est une matrice M x D dans laquelle chaque ligne est un exemple de test 
         X_te=X.astype(np.float32)
         num_test_examples=X.shape[0]
+        print("Num test exemple="+str(num_test_examples))
         y_pred=np.zeros(num_test_examples,self.y_tr.dtype)
         for i in range(num_test_examples):
-            print("I="+str(i))
+            #print("I="+str(i))
             if self.distance_func=='l2':
                 distances=np.sum(np.sqare(self.X_tr-X_te[i]),axis=1)
             else:
@@ -67,16 +68,18 @@ class NearestNeighbor:
             smallest_dist_idx=np.argmin(distances)        
             del distances
             gc.collect()
+            #print("INDEX="+str(smallest_dist_idx));
             y_pred[i]=self.y_tr[smallest_dist_idx]
-dataset=SKETCH("/home/bruno.boissie/Travail/artificial_intelligence/uisketch/archive")
+        return y_pred;
+dataset=SKETCH("/Users/brunoboissie/Desktop/MASTER/Stage_M2/artificial_intelligence/uisketch/archive")
 X_train,y_train,X_test,y_test=dataset.train_test_split()
 X,y=dataset.all_data();
 #print(dataset.X.shape);
-#dataset.show_examples()
+dataset.show_examples()
 nn=NearestNeighbor();
 nn.train(X_train,y_train);
 print("Prediction")
-y_pred=nn.predict(X_test[:10]);
+y_pred=nn.predict(X_test[:100]);
 print("Precision")
-accuracy=np.mean(y_test[:10]==y_pred)
+accuracy=np.mean(y_test[:100]==y_pred)
 print(accuracy)
