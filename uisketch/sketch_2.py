@@ -9,7 +9,7 @@ class SKETCH:
         y=[];
         os.chdir(archive_path)
         tab=np.genfromtxt("labels.csv",delimiter=",",dtype="U75",skip_header=1)
-        print(tab.shape)
+        #print(tab.shape)
         self.LABEL_NAMES=[os.path.basename(f.path) for f in os.scandir(os.getcwd()) if f.is_dir()];
         liste=tab[:,0]
         np.random.shuffle(liste);
@@ -36,5 +36,5 @@ class SKETCH:
         img=self.X[idx].reshape(224,224).astype(np.uint8)/255;
         return img
 dataset=SKETCH("/home/bruno.boissie/Travail/artificial_intelligence/uisketch/archive")
-print(dataset.X.shape);
+#print(dataset.X.shape);
 dataset.show_examples()
